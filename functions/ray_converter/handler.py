@@ -1,6 +1,5 @@
 import json
-import logging
-import sys
+import loimport sys
 from datetime import datetime
 
 # Configure CloudWatch structured logging
