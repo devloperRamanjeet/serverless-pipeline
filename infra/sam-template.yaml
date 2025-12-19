@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Ray Converter Lambda Function with API Gateway
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+    Runtime: python3.11
+    Environment:
+      Variables:
+        LOG_LEVEL: INFO
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+    Description: Environment name (dev, staging, prod)
+
+Resources:
+  # IAM Role for Lambda
+  RayConverterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # Lambda Function
+  RayConverterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'ray-converter-${EnvironmentName}'
+      CodeUri: ../functions/ray_converter/
+      Handler: handler.lambda_handler
+      Role: !GetAtt RayConverterRole.Arn
+      Runtime: python3.11
+      Timeout: 30
+      MemorySize: 128
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref EnvironmentName
+      Events:
+        RayConverterApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref RayConverterApi
+            Path: /ray
+            Method: POST
+            Auth:
+              DefaultAuthorizer: !Ref ApiKeyAuthorizer
+            
+        RayConverterOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref RayConverterApi
+            Path: /ray
+            Method: OPTIONS
+
+  # API Gateway
+  RayConverterApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref EnvironmentName
+      TracingEnabled: true
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+
+  # API Key Authorizer (optional)
+  ApiKeyAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: ApiKeyAuthorizer
+      Type: TOKEN
+      IdentitySource: method.request.header.Authorization
+      AuthorizerResultTtlInSeconds: 0
+      AuthorizerUri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RayConverterFunction.Arn}/invocations'
+
+  # CloudWatch Log Group
+  RayConverterLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/ray-converter-${EnvironmentName}'
+      RetentionInDays: 14
+
+Outputs:
+  RayConverterFunctionArn:
+    Description: ARN of the Ray Converter Lambda function
+    Value: !GetAtt RayConverterFunction.Arn
+    Export:
+      Name: !Sub 'RayConverterFunctionArn-${EnvironmentName}'
+
+  RayConverterFunctionName:
+    Description: Name of the Ray Converter Lambda function
+    Value: !Ref RayConverterFunction
+    Export:
+      Name: !Sub 'RayConverterFunctionName-${EnvironmentName}'
+
+  RayConverterApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${RayConverterApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentName}/ray'
+    Export:
+      Name: !Sub 'RayConverterApiEndpoint-${EnvironmentName}'
+
+  RayConverterLogGroupName:
+    Description: CloudWatch Log Group for Lambda
+    Value: !Ref RayConverterLogGroup
+    Export:
+      Name: !Sub 'RayConverterLogGroup-${EnvironmentName}'

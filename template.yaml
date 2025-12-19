@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Ray Converter Lambda - Local Development
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+    Runtime: python3.11
+
+Resources:
+  RayConverterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ray-converter
+      CodeUri: functions/ray_converter/
+      Handler: handler.lambda_handler
+      Events:
+        RayConverterApi:
+          Type: Api
+          Properties:
+            Path: /ray
+            Method: POST
+            RestApiId: !Ref RayConverterApi
+
+  RayConverterApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      TracingEnabled: false
+
+Outputs:
+  RayConverterFunctionArn:
+    Value: !GetAtt RayConverterFunction.Arn
+  
+  RayConverterApiEndpoint:
+    Value: !Sub 'http://localhost:3000/ray'
+    Description: Local API endpoint
