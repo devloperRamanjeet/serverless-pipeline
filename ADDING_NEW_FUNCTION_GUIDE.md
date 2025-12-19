@@ -1,6 +1,4 @@
-# 📝 Adding a New Function - Complete Guide
-
-This guide walks through **all the steps and files needed** to add a new Lambda function to your serverless pipeline.
+This document has been moved to the documentation folder: [docs/ADDING_NEW_FUNCTION_GUIDE.md](docs/ADDING_NEW_FUNCTION_GUIDE.md)
 
 ---
 

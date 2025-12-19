@@ -1,4 +1,8 @@
-This document has been moved to the documentation folder: [docs/ADDING_NEW_FUNCTION_CHECKLIST.md](docs/ADDING_NEW_FUNCTION_CHECKLIST.md)
+# ⚡ Quick Checklist: Adding a New Function
+
+Use this quick reference when adding a new Lambda function.
+
+**Replacing `function_name` with your actual name** (e.g., `image_processor`)
 
 ---
 
@@ -38,58 +42,58 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 class StructuredLogger:
-    def __init__(self, logger):
-        self.logger = logger
+		def __init__(self, logger):
+				self.logger = logger
     
-    def log(self, level, message, **kwargs):
-        log_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "level": level,
-            "message": message,
-            **kwargs
-        }
-        self.logger.log(getattr(logging, level), json.dumps(log_entry))
+		def log(self, level, message, **kwargs):
+				log_entry = {
+						"timestamp": datetime.utcnow().isoformat(),
+						"level": level,
+						"message": message,
+						**kwargs
+				}
+				self.logger.log(getattr(logging, level), json.dumps(log_entry))
     
-    def info(self, message, **kwargs):
-        self.log("INFO", message, **kwargs)
+		def info(self, message, **kwargs):
+				self.log("INFO", message, **kwargs)
     
-    def error(self, message, **kwargs):
-        self.log("ERROR", message, **kwargs)
+		def error(self, message, **kwargs):
+				self.log("ERROR", message, **kwargs)
     
-    def warning(self, message, **kwargs):
-        self.log("WARNING", message, **kwargs)
+		def warning(self, message, **kwargs):
+				self.log("WARNING", message, **kwargs)
 
 structured_logger = StructuredLogger(logger)
 
 def lambda_handler(event, context):
-    """YOUR FUNCTION DESCRIPTION HERE"""
-    request_id = context.aws_request_id if context else "local-test"
+		"""YOUR FUNCTION DESCRIPTION HERE"""
+		request_id = context.aws_request_id if context else "local-test"
     
-    try:
-        structured_logger.info(
-            "Processing request",
-            request_id=request_id,
-            event_keys=list(event.keys())
-        )
+		try:
+				structured_logger.info(
+						"Processing request",
+						request_id=request_id,
+						event_keys=list(event.keys())
+				)
         
-        # YOUR LOGIC HERE
+				# YOUR LOGIC HERE
         
-        return {
-            "statusCode": 200,
-            "body": json.dumps({"status": "success"})
-        }
+				return {
+						"statusCode": 200,
+						"body": json.dumps({"status": "success"})
+				}
     
-    except Exception as e:
-        structured_logger.error(
-            "Error",
-            request_id=request_id,
-            error=str(e),
-            error_type=type(e).__name__
-        )
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": str(e)})
-        }
+		except Exception as e:
+				structured_logger.error(
+						"Error",
+						request_id=request_id,
+						error=str(e),
+						error_type=type(e).__name__
+				)
+				return {
+						"statusCode": 500,
+						"body": json.dumps({"error": str(e)})
+				}
 ```
 
 ### test_handler.py Template
@@ -103,29 +107,29 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from handler import lambda_handler
 
 class MockContext:
-    aws_request_id = "test-123"
-    function_name = "test-function"
+		aws_request_id = "test-123"
+		function_name = "test-function"
 
 def test_success():
-    event = {"key": "value"}
-    result = lambda_handler(event, MockContext())
-    assert result["statusCode"] == 200
+		event = {"key": "value"}
+		result = lambda_handler(event, MockContext())
+		assert result["statusCode"] == 200
 
 def test_empty():
-    event = {}
-    result = lambda_handler(event, MockContext())
-    assert result["statusCode"] == 200
+		event = {}
+		result = lambda_handler(event, MockContext())
+		assert result["statusCode"] == 200
 
 def test_none_context():
-    event = {"key": "value"}
-    result = lambda_handler(event, None)
-    assert result["statusCode"] == 200
+		event = {"key": "value"}
+		result = lambda_handler(event, None)
+		assert result["statusCode"] == 200
 
 def test_error_handling():
-    # Test error case
-    event = {"invalid": True}
-    result = lambda_handler(event, MockContext())
-    # Expect 200 or 500 depending on logic
+		# Test error case
+		event = {"invalid": True}
+		result = lambda_handler(event, MockContext())
+		# Expect 200 or 500 depending on logic
 ```
 
 ### __init__.py
@@ -138,8 +142,8 @@ def test_error_handling():
 
 ```json
 {
-  "key": "value",
-  "data": "sample data"
+	"key": "value",
+	"data": "sample data"
 }
 ```
 
@@ -152,47 +156,47 @@ def test_error_handling():
 ```terraform
 # Lambda function for function_name
 resource "aws_lambda_function" "function_name" {
-  filename      = data.archive_file.function_name_zip.output_path
-  function_name = "function-name"
-  role          = aws_iam_role.lambda_exec_role.arn
-  handler       = "handler.lambda_handler"
-  runtime       = "python3.11"
-  timeout       = 30
-  memory_size   = 128
+	filename      = data.archive_file.function_name_zip.output_path
+	function_name = "function-name"
+	role          = aws_iam_role.lambda_exec_role.arn
+	handler       = "handler.lambda_handler"
+	runtime       = "python3.11"
+	timeout       = 30
+	memory_size   = 128
 
-  source_code_hash = data.archive_file.function_name_zip.output_base64sha256
+	source_code_hash = data.archive_file.function_name_zip.output_base64sha256
 
-  environment {
-    variables = {
-      LOG_LEVEL = "INFO"
-    }
-  }
+	environment {
+		variables = {
+			LOG_LEVEL = "INFO"
+		}
+	}
 
-  depends_on = [aws_iam_role_policy_attachment.lambda_basic_execution]
+	depends_on = [aws_iam_role_policy_attachment.lambda_basic_execution]
 }
 
 # Archive
 data "archive_file" "function_name_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/../functions/function_name"
-  output_path = "${path.module}/../build/function_name.zip"
+	type        = "zip"
+	source_dir  = "${path.module}/../functions/function_name"
+	output_path = "${path.module}/../build/function_name.zip"
 }
 
 # CloudWatch Logs
 resource "aws_cloudwatch_log_group" "function_name_logs" {
-  name              = "/aws/lambda/function-name"
-  retention_in_days = var.log_retention_days
+	name              = "/aws/lambda/function-name"
+	retention_in_days = var.log_retention_days
 }
 
 # Outputs
 output "function_name_function_arn" {
-  value       = aws_lambda_function.function_name.arn
-  description = "ARN of function_name Lambda"
+	value       = aws_lambda_function.function_name.arn
+	description = "ARN of function_name Lambda"
 }
 
 output "function_name_function_name" {
-  value       = aws_lambda_function.function_name.function_name
-  description = "Name of function_name Lambda"
+	value       = aws_lambda_function.function_name.function_name
+	description = "Name of function_name Lambda"
 }
 ```
 
@@ -201,27 +205,27 @@ output "function_name_function_name" {
 ```terraform
 # API Gateway route
 resource "aws_apigatewayv2_route" "function_name_route" {
-  api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "POST /api-path"  # CHANGE THIS
-  target    = "integrations/${aws_apigatewayv2_integration.function_name_integration.id}"
+	api_id    = aws_apigatewayv2_api.http_api.id
+	route_key = "POST /api-path"  # CHANGE THIS
+	target    = "integrations/${aws_apigatewayv2_integration.function_name_integration.id}"
 }
 
 # Integration
 resource "aws_apigatewayv2_integration" "function_name_integration" {
-  api_id           = aws_apigatewayv2_api.http_api.id
-  integration_type = "AWS_PROXY"
-  integration_method = "POST"
-  integration_uri    = aws_lambda_function.function_name.invoke_arn
-  payload_format_version = "2.0"
+	api_id           = aws_apigatewayv2_api.http_api.id
+	integration_type = "AWS_PROXY"
+	integration_method = "POST"
+	integration_uri    = aws_lambda_function.function_name.invoke_arn
+	payload_format_version = "2.0"
 }
 
 # Permission
 resource "aws_lambda_permission" "function_name_api" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.function_name.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+	statement_id  = "AllowAPIGatewayInvoke"
+	action        = "lambda:InvokeFunction"
+	function_name = aws_lambda_function.function_name.function_name
+	principal     = "apigateway.amazonaws.com"
+	source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
 }
 ```
 
@@ -232,26 +236,26 @@ resource "aws_lambda_permission" "function_name_api" {
 ### Add to `config/triggers.yaml`
 
 ```yaml
-  function_name:           # Replace with your function name
-    name: function-name    # Replace with AWS name
-    runtime: python3.11
-    memory: 128
-    timeout: 30
+	function_name:           # Replace with your function name
+		name: function-name    # Replace with AWS name
+		runtime: python3.11
+		memory: 128
+		timeout: 30
     
-    api_gateway:
-      enabled: true
-      route: "POST /api-path"
-      cors: true
+		api_gateway:
+			enabled: true
+			route: "POST /api-path"
+			cors: true
     
-    sqs:
-      enabled: false
-      queue_name: "function-name-queue"
-      batch_size: 10
+		sqs:
+			enabled: false
+			queue_name: "function-name-queue"
+			batch_size: 10
     
-    s3:
-      enabled: false
-      bucket_name: "function-name-input"
-      events: ["s3:ObjectCreated:*"]
+		s3:
+			enabled: false
+			bucket_name: "function-name-input"
+			events: ["s3:ObjectCreated:*"]
 ```
 
 ### Update `requirements.txt` (if needed)
@@ -277,10 +281,10 @@ sys.path.insert(0, "functions/function_name")
 from handler import lambda_handler
 
 class MockContext:
-    aws_request_id = "test"
+		aws_request_id = "test"
 
 with open("events/function_name_event.json") as f:
-    event = json.load(f)
+		event = json.load(f)
 
 result = lambda_handler(event, MockContext())
 print(json.dumps(json.loads(result['body']), indent=2))
@@ -405,3 +409,4 @@ Sample event:        events/my_function_event.json (snake_case)
 - **Full Guide:** [ADDING_NEW_FUNCTION_GUIDE.md](ADDING_NEW_FUNCTION_GUIDE.md)
 - **Terraform Info:** [TERRAFORM_PUSH_BEHAVIOR.md](TERRAFORM_PUSH_BEHAVIOR.md)
 - **CloudWatch Guide:** [CLOUDWATCH_MONITORING_GUIDE.md](CLOUDWATCH_MONITORING_GUIDE.md)
+

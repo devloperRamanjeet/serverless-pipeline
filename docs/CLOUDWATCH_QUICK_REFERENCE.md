@@ -1,4 +1,12 @@
-This document has been moved to the documentation folder: [docs/CLOUDWATCH_QUICK_REFERENCE.md](docs/CLOUDWATCH_QUICK_REFERENCE.md)
+````markdown
+# 📊 CloudWatch Quick Reference Card
+
+## 🚀 Deploy CloudWatch
+
+```bash
+cd infra
+terraform apply
+```
 
 ---
 
@@ -221,3 +229,5 @@ https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/ray-conve
 
 **Last Updated:** December 19, 2025
 **Status:** ✅ Ready for Production
+
+````

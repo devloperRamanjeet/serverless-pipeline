@@ -1,4 +1,9 @@
-This document has been moved to the documentation folder: [docs/TRIGGER_GUIDE.md](docs/TRIGGER_GUIDE.md)
+````markdown
+# 🔧 Lambda Trigger Configuration Guide
+
+## Overview
+
+This project now uses a **centralized trigger configuration system** that makes it easy to enable/disable different Lambda triggers without modifying Terraform code.
 
 ## File Structure
 
@@ -279,3 +284,4 @@ cd infra && terraform apply
 ---
 
 For more help, see the main [README.md](README.md)
+````

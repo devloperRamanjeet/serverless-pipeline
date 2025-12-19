@@ -1,6 +1,4 @@
-# 📊 Visual Guide: Push → Deploy → AWS Flow
-
-## What Happens When You Push Code
+This document has been moved to the documentation folder: [docs/TERRAFORM_VISUAL_GUIDE.md](docs/TERRAFORM_VISUAL_GUIDE.md)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

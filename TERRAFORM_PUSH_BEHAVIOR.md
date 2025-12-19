@@ -1,13 +1,4 @@
-# ❓ What Happens When You Push Code? - Terraform Behavior Explained
-
-## TL;DR - Quick Answer
-
-**When you push code to GitHub:**
-- ✅ Terraform **ONLY creates new resources** if they don't exist
-- ✅ Terraform **ONLY updates resources** if code changed
-- ✅ Terraform **leaves unchanged resources alone** (no disruption)
-- ❌ Terraform **NEVER destroys** infrastructure on push
-- ❌ You must **manually run** `terraform destroy` to delete resources
+This document has been moved to the documentation folder: [docs/TERRAFORM_PUSH_BEHAVIOR.md](docs/TERRAFORM_PUSH_BEHAVIOR.md)
 
 ---
 

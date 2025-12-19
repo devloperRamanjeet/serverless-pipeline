@@ -1,5 +1,7 @@
 # 📘 Developer Guide: AI Utils Lambda Pipeline
 
+> Note: All user-facing documentation has moved to the `docs/` folder. See the documentation index: [docs/DOCUMENTATION_INDEX.md](docs/DOCUMENTATION_INDEX.md)
+
 This guide explains how to **develop, test, and deploy AWS Lambda functions** using **VSCode, GitHub Actions, Terraform, and SAM CLI**.  
 We use a **global `requirements.txt`** for dependencies to keep things simple and fast.
 

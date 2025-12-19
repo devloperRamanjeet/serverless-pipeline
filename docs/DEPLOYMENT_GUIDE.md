@@ -1,4 +1,9 @@
-This document has been moved to the documentation folder: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)
+````markdown
+# 🚀 DEPLOYMENT GUIDE - Ray Converter Lambda
+
+## ✅ Project Status: READY FOR DEPLOYMENT
+
+All components are complete and tested:
 - ✅ Lambda handler with error handling
 - ✅ Unit tests (4/4 passing)
 - ✅ Terraform infrastructure code
@@ -217,7 +222,7 @@ nano config/triggers.yaml
 
 # Plan changes
 cd infra
-terraform plan
+tensorflow plan
 
 # Apply changes
 terraform apply
@@ -362,3 +367,4 @@ terraform show
 
 **Congratulations! Your Lambda function is now deployed! 🎉**
 
+````
