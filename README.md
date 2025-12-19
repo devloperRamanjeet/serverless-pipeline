@@ -392,7 +392,68 @@ jobs:
 7. **YAML pipeline** → automated build + deploy with global dependencies.
 
 ---
+# 📊 CloudWatch Monitoring for Production Debugging
 
+Your Lambda function includes **enterprise-grade CloudWatch monitoring** for production debugging:
+
+## What's Monitored
+
+- ✅ **Structured Logs** - JSON-formatted logs for easy parsing
+- ✅ **Real-time Metrics** - Errors, warnings, success rate tracked
+- ✅ **Auto Alarms** - Email alerts on errors, timeouts, throttles
+- ✅ **Visual Dashboard** - Pre-built metrics dashboard
+- ✅ **Log Insights** - Advanced querying and analysis
+
+## Quick Start
+
+### View Live Logs
+
+```bash
+# Stream logs in real-time
+aws logs tail /aws/lambda/ray-converter --follow
+
+# View last 100 lines
+aws logs tail /aws/lambda/ray-converter --max-items 100
+```
+
+### Open Dashboard
+
+```
+AWS Console → CloudWatch → Dashboards → ray-converter-metrics
+```
+
+### Enable Email Alerts
+
+Edit `infra/terraform.tfvars`:
+```terraform
+enable_alarms = true
+alert_email   = "your-email@example.com"  # Add your email
+```
+
+Then redeploy:
+```bash
+cd infra && terraform apply
+```
+
+### Query Logs in Logs Insights
+
+Example query to find errors:
+```
+fields @timestamp, @message, request_id
+| filter @message like /ERROR/
+| stats count() as error_count by @message
+```
+
+## Full Documentation
+
+See **[CLOUDWATCH_MONITORING_GUIDE.md](CLOUDWATCH_MONITORING_GUIDE.md)** for:
+- Detailed monitoring setup
+- All pre-built queries
+- Production debugging workflows
+- Troubleshooting guide
+- Metrics explanations
+
+---
 # 📊 CODE FLOW DIAGRAM & EXECUTION PATH
 
 ## Local Development Flow

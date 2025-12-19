@@ -68,7 +68,7 @@ data "archive_file" "ray_converter_zip" {
 # CloudWatch Log Group for Lambda
 resource "aws_cloudwatch_log_group" "ray_converter_logs" {
   name              = "/aws/lambda/ray-converter"
-  retention_in_days = 14
+  retention_in_days = var.log_retention_days
 }
 
 output "lambda_function_arn" {
